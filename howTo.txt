@@ -10,3 +10,9 @@ npm i --save react-native-ble-manager
 
 //redux
 npm install @reduxjs/toolkit react-redux
+
+
+npm install --save react-native-vector-icons
+
+npm install convert-string
+
