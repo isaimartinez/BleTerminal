@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Scanner from './screens/Scanner';
 import Terminal from './screens/Terminal';
+import BleSwitchBtn from './components/BleSwitchBtn';
 
 const Stack = createNativeStackNavigator();
 
@@ -16,7 +17,10 @@ const router = () => {
         <Stack.Screen 
           name="Terminal" 
           component={Terminal} 
-          options={({ route }) => ({ title: route.params.device?.name })}
+          options={({ navigation,route }) => ({ 
+            title: route.params.device?.name, 
+            headerRight: (props) => <BleSwitchBtn route={route}/>,
+          })}
         />
       </Stack.Navigator>
     </NavigationContainer>
