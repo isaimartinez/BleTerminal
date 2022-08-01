@@ -7,13 +7,13 @@ const KeyboardAvoidingWrapper = ({children}) => {
             behavior={Platform.OS === 'ios' ? 'height' : null}
             keyboardVerticalOffset={130}
         >
-            <ScrollView 
+            {/* <ScrollView 
               contentContainerStyle={{flex: 1}}
-            >
+            > */}
                 {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
                     {children}
                 {/* </TouchableWithoutFeedback> */}
-            </ScrollView>
+            {/* </ScrollView> */}
         </KeyboardAvoidingView>
     )
 };

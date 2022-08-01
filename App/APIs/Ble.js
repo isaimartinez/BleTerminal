@@ -7,11 +7,10 @@ import { stringToBytes, bytesToString } from "convert-string";
 
 const BleManagerModule = NativeModules.BleManager
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule)
-// const service = "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
-// const characteristic = "beb5483e-36e1-4688-b7f5-ea07361b26a8"
+
 
 export const initBle = () => {
-  BleManager.start({ showAlert: false })
+  BleManager.start({ showAlert: true })
 
   bleManagerEmitter.addListener('BleManagerDiscoverPeripheral', handleDiscoverPeripheral);
   bleManagerEmitter.addListener('BleManagerStopScan', handleStopScan );
@@ -38,11 +37,12 @@ export const initBle = () => {
 }
 
 export const unmountBle = () => {
+  bleManagerEmitter.removeAllListeners('BleManagerDiscoverPeripheral', handleDiscoverPeripheral);
+  bleManagerEmitter.removeAllListeners('BleManagerStopScan', handleStopScan );
+  bleManagerEmitter.removeAllListeners('BleManagerDisconnectPeripheral', handleDisconnectedPeripheral );
+  bleManagerEmitter.removeAllListeners('BleManagerDidUpdateValueForCharacteristic', handleUpdateValueForCharacteristic );
   console.log('unmount');
-  // bleManagerEmitter.removeListener('BleManagerDiscoverPeripheral', handleDiscoverPeripheral);
-  // bleManagerEmitter.removeListener('BleManagerStopScan', handleStopScan );
-  // bleManagerEmitter.removeListener('BleManagerDisconnectPeripheral', handleDisconnectedPeripheral );
-  // bleManagerEmitter.removeListener('BleManagerDidUpdateValueForCharacteristic', handleUpdateValueForCharacteristic );
+  store.dispatch(setIsInit(false))
 }
 
 
@@ -55,7 +55,6 @@ const handleDiscoverPeripheral = (peripheral) => {
 }
 
 const handleStopScan = () => {
-  console.log('Scan is stopped');
   store.dispatch(setIsScanning(false))
 }
 
@@ -65,14 +64,22 @@ const handleDisconnectedPeripheral = (data) => {
 }
 
 const handleUpdateValueForCharacteristic = (data) => {
-  console.log('Received data from ' + data.peripheral + ' characteristic ' + data.characteristic, data.value);
+  console.log('Received data from ', data.value);
+  if(data.value) {
+    let response = bytesToString(data.value);
+    console.log('Received response', response);
+    store.dispatch(addHistory({data: response, type: 2}))
+  } else {
+    console.log('Received response', 'NULL');
+    store.dispatch(addHistory({data: 'NULL', type: 2}))
+
+  }
 }
 
 export const scan = () => {
   store.dispatch(setDevices([]))
   BleManager.scan([], 2, false).then(() => {
     store.dispatch(setIsScanning(true))
-    console.log('Scanning...');
   }).catch(err => {
     console.error(err);
   });
@@ -103,8 +110,7 @@ export const connectAndPrepare = async (id) => {
 
 export const disconnect = async (id) => {
   BleManager.disconnect(id).then(() => {
-    console.log("Disconnected");
-    store.dispatch(setIsConnected(false))
+    console.log("Disconnecting");
   })
   .catch((error) => {
     console.log(error);
@@ -117,7 +123,7 @@ export const write = async (id, service,characteristic, val) => {
     store.dispatch(addHistory({data: val, type: 3}))
     console.log("Writed: " + write);
 
-    read(id, service,characteristic)
+    // read(id, service,characteristic)
 
   }).catch((error) => {
     console.log(error);

@@ -18,8 +18,8 @@ const RenderHistory = ({data, type, date, i}) => {
 
   return (
     <View key={`renderHistory_${i}`} style={{flexDirection: 'row'}} >
-      <Text style={{color: 'white'}}>{date} </Text>
-      <Text style={{color: `${textColor(type)}`}}>{data}</Text>
+      <Text style={{color: 'white', fontSize: 17}}>{date} </Text>
+      <Text style={{color: `${textColor(type)}`, fontSize: 17}}>{data}</Text>
     </View>
   )
 }

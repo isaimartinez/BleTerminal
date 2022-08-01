@@ -25,7 +25,7 @@ const RenderDevice = ({device, i}) => {
     >
       <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
         <Text style={{fontSize: 19}}>{device.name}</Text>
-        <Icon name="wifi" size={30} color={rssiColor(device.rssi)} />
+        <Icon name="bluetooth-searching" size={30} color={rssiColor(device.rssi)} />
       </View>
     </TouchableOpacity>
   )

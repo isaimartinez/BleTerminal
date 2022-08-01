@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { SafeAreaView,View, TouchableOpacity, TextInput, ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native'
+import React, { useEffect, useState, useRef } from 'react'
+import { SafeAreaView,View, TouchableOpacity, TextInput, ScrollView, TouchableWithoutFeedback, Keyboard, Text } from 'react-native'
 import { connectAndPrepare, disconnect, write } from '../APIs/Ble'
 import { useSelector, useDispatch } from 'react-redux'
 import { setHistory } from '../redux/bleSlice'
@@ -11,7 +11,9 @@ const Terminal = ({ route, navigation }) => {
   const dispatch = useDispatch()
   const {uuids, history} = useSelector((state) => state.ble)
   const {device} = route.params
-  const [text, setText] = useState(null)
+  const [text, setText] = useState("")
+  const scrollViewRef = useRef();
+
 
   useEffect(() => {
     dispatch(setHistory([]))
@@ -21,13 +23,20 @@ const Terminal = ({ route, navigation }) => {
       dispatch(setHistory([]))
     }
   }, [])
+
+  useEffect(() => {
+    scrollViewRef.current.scrollToEnd({animated: true})
+  }, [history])
+  
   
   const connect = () => {
     connectAndPrepare(device.id)
   }
 
   const handleWrite = () => {
-    write(device.id, uuids.service, uuids.characteristic, text)
+    if(text){
+      write(device.id, uuids.service, uuids.characteristic, text)
+    }
   }
 
   return (
@@ -35,17 +44,20 @@ const Terminal = ({ route, navigation }) => {
       <KeyboardAvoidingWrapper>
         <View style={{flex: 1}}>
           <View style={{flex: 9, backgroundColor: 'black'}}>
-            <ScrollView contentContainerStyle={{flex: 1, padding: 5}}>
+            <ScrollView contentContainerStyle={{flexGrow: 1, padding: 5 }}
+              ref={scrollViewRef}
+            >
               {
                 history.map((h,i) => (
                   <RenderHistory {...h} i={i} key={`renderHistory_${i}`}/>
                 ))
               }
+              <Text>  </Text>
             </ScrollView>
           </View>
 
 
-          <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', padding: 3}}>
+          <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center',}}>
             <View style={{flex: 8, justifyContent: 'center', alignItems: 'center'}}>
               <TextInput
                 style={{ height: 45, width: '90%', borderColor: 'gray', borderWidth: 1, borderRadius: 3}}
@@ -57,11 +69,11 @@ const Terminal = ({ route, navigation }) => {
               />
             </View>
 
-            {/* <TouchableOpacity style={{flex: 2, justifyContent: 'center', alignItems: 'center'}}
-              onPress={() => handleWrite()}
+            <TouchableOpacity style={{flex: 2, justifyContent: 'center', alignItems: 'center'}}
+              onPress={() => {handleWrite();Keyboard.dismiss()}}
             >
               <Icon name="send" size={30} color="#000000" />
-            </TouchableOpacity> */}
+            </TouchableOpacity>
           </View>
 
         </View>
