@@ -5,7 +5,10 @@ import {name as appName} from './app.json';
 import { Provider } from 'react-redux'
 import {store} from './App/redux/store'
 
-LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
+// LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
+// LogBox.ignoreLogs(['Possible Unhandled: ...']); // Ignore log notification by message
+LogBox.ignoreAllLogs();
+
 
 
 const BleApp = () =>
